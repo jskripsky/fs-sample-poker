@@ -34,13 +34,19 @@ type HandCategory =
 
 /// == Values ==
 
-/// seq [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
+/// [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
 let rankOrder = [           
 	for v in 2..10 do yield (Value v)
 	yield! [Jack; Queen; King; Ace]]
 
 
 /// == Functions ==
+
+/// Extract card ranks
+let internal extractRanks: (Hand -> Rank list) = List.map fst
+
+/// Sort ranks
+let internal sortRanks = extractRanks >> List.sort
 
 /// Check for flush (i.e. all cards share the same suit)
 let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)]
@@ -51,12 +57,6 @@ let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); 
 
 /// [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] => false
 
-/// Extract card ranks
-let internal extractRanks: (Hand -> Rank list) = List.map fst
-
-/// Sort ranks
-let internal sortRanks = extractRanks >> List.sort
-
 /// Find highest ranking card in hand
 let internal highestRank = extractRanks >> List.max
 
@@ -64,12 +64,12 @@ let internal highestRank = extractRanks >> List.max
 // TODO: handle case Ace = (Value 1)
 let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``); (v 10, ``♥``); (J, ``♣``)]
 	let ranks = sortRanks hand		/// ranks = [v 8; v 9; v 10; J; Q]
-	let straightStartingWith r =		/// r = v 8
-		rankOrder				///= seq [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
-		|> Seq.skipWhile ((<>) r)	///= seq [v 8; v 9; v 10; J; Q; K; A]
+	let generateStraight start =		/// start = v 8
+		rankOrder				///= [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
+		|> Seq.skipWhile ((<>) start)	///= seq [v 8; v 9; v 10; J; Q; K; A]
 		|> Seq.take 5				///= seq [v 8; v 9; v 10; J; Q]
 		|> Seq.toList				///= [v 8; v 9; v 10; J; Q]
-	ranks = straightStartingWith (ranks.[0])		///= true
+	ranks = generateStraight (ranks.[0])		///= true
 
 /// Group cards by rank, sort first by count, then rank
 let internal groupByRank hand =
@@ -87,9 +87,11 @@ let internal groupByRank hand =
 /// Calculate the hand's category
 let categorize hand =
 	if List.length hand <> 5 then invalidArg "hand" "Hand does not conain five cards."
+
 	match (isStraight hand, isFlush hand) with
-	| (false, false) -> 
-		match hand |> groupByRank |> List.rev with
+	| (false, false) ->
+		let descGroups = hand |> groupByRank |> List.rev
+		match descGroups with
 		| (1, _)::_ -> HighCard
 		| (2, _)::(1, _)::_ -> OnePair
 		| (2, _)::(2, _)::_ -> TwoPair
