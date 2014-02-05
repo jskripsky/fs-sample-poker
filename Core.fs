@@ -39,6 +39,8 @@ let rankOrder = [
 	for v in 2..10 do yield (Value v)
 	yield! [Jack; Queen; King; Ace]]
 
+/// Staight starting with Ace as one (but sorted using regular ordering)
+let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
 
 /// == Functions ==
 
@@ -47,6 +49,14 @@ let internal extractRanks: (Hand -> Rank list) = List.map fst
 
 /// Sort ranks
 let internal sortRanks = extractRanks >> List.sort
+
+/// Find highest ranking card in hand
+let internal highestRank hand =
+	let ranks = hand |> sortRanks
+	if ranks <> straightFromOne then
+		ranks |> List.max
+	else
+		(v 5)  // straight with Ace = 1
 
 /// Check for flush (i.e. all cards share the same suit)
 let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)]
@@ -57,11 +67,7 @@ let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); 
 
 /// [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] => false
 
-/// Find highest ranking card in hand
-let internal highestRank = extractRanks >> List.max
-
 /// Check for straight (five consecutively ascending ranks)
-// TODO: handle case Ace = (Value 1)
 let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``); (v 10, ``♥``); (J, ``♣``)]
 	let ranks = sortRanks hand		/// ranks = [v 8; v 9; v 10; J; Q]
 	let generateStraight start =		/// start = v 8
@@ -70,6 +76,7 @@ let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``
 		|> Seq.take 5				///= seq [v 8; v 9; v 10; J; Q]
 		|> Seq.toList				///= [v 8; v 9; v 10; J; Q]
 	ranks = generateStraight (ranks.[0])		///= true
+	|| ranks = straightFromOne  // special case Ace = v 1
 
 /// Group cards by rank, sort first by count, then rank
 let internal groupByRank hand =
@@ -103,7 +110,6 @@ let categorize hand =
 	| (false, true) -> Flush
 	| (true, true) -> if highestRank hand <> Ace then StraightFlush else RoyalFlush
 
-// TODO: handle case Ace = (Value 1)
 let compareHands h1 h2 =
 	let (c1, c2) = (categorize h1, categorize h2)
 	match compare c1 c2 with
@@ -111,5 +117,5 @@ let compareHands h1 h2 =
 		match c1 with
 		| HighCard | OnePair | TwoPair | ThreeOfAKind
 		| FullHouse | FourOfAKind -> compare (groupByRank h1) (groupByRank h2)
-		| _ -> compare (highestRank h1) (highestRank h2)
+		| _ -> compare (highestRank h1) (highestRank h2)  // Note: this handles staights with Ace = (Value 1) as well.
 	| c -> c  // different categories
