@@ -9,7 +9,7 @@ type Suit =
 	| Club		// ♣
 
 type Rank =
-	| Value of int (* 2..10 *)
+	| Value of v: int  // v ∈ [2..10]
 	| Jack | Queen | King | Ace
 
 let (``♠``, ``♥``, ``♦``, ``♣``) = (Spade, Heart, Diamond, Club)
