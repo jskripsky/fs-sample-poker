@@ -3,10 +3,10 @@ module Poker.Core
 /// == Card model ==
 [<NoComparison>]
 type Suit =
-	| Spade  // ♠
-	| Heart  // ♥
-	| Diamond  // ♦
-	| Club  // ♣
+	| Spade		// ♠
+	| Heart		// ♥
+	| Diamond	// ♦
+	| Club		// ♣
 
 type Rank =
 	| Value of int (* 2..10 *)
@@ -20,22 +20,22 @@ type Hand = Card list
 
 /// == Valuation model ==
 type HandCategory =
-	| HighCard // no matching ranks, no straight or flush
-	| OnePair  // 2 + 1 + 1+ 1
-	| TwoPair  // 2 + 2 + 1
-	| ThreeOfAKind  // 3 + 1 + 1
-	| Straight  // r..(r + 4)
-	| Flush  // matching suits
-	| FullHouse // 3 + 2
-	| FourOfAKind  // 4 + 1
+	| HighCard		// no matching ranks, no straight or flush
+	| OnePair		// 2 + 1 + 1+ 1
+	| TwoPair		// 2 + 2 + 1
+	| ThreeOfAKind	// 3 + 1 + 1
+	| Straight		// r..(r + 4)
+	| Flush			// matching suits
+	| FullHouse		// 3 + 2
+	| FourOfAKind	// 4 + 1
 	| StraightFlush
-	| RoyalFlush  // straight flush down from Ace
+	| RoyalFlush		// straight flush down from Ace
 
 
 /// == Values ==
 
 /// [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
-let rankOrder = [           
+let rankOrder = [
 	for v in 2..10 do yield (Value v)
 	yield! [Jack; Queen; King; Ace]]
 
