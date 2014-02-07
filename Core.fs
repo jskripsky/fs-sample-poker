@@ -98,16 +98,14 @@ let internal groupByRank hand =
 /// [(v 4, ``♦``); (v 10, ``♥``); (v 4, ``♥``); (Q, ``♥``); (v 4, ``♠``)] => [(1, v 10); (1, Q); (3, v 4)]
 
 /// Calculate the hand's category
-let categorize hand =
-	if List.length hand <> 5 then invalidArg "hand" "Hand does not conain five cards."
-
-	match (isStraight hand, isFlush hand) with
-	| (false, false) ->
-		let descGroups = hand |> groupByRank |> List.rev
+let categorize hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
+	match (isStraight hand, isFlush hand) with				/// (false, false)
+	| (false, false) ->									/// /* this branch taken */
+		let descGroups = hand |> groupByRank |> List.rev	/// [(2, J); (2, v 9); (1, A)]
 		match descGroups with
 		| (1, _)::_ -> HighCard
 		| (2, _)::(1, _)::_ -> OnePair
-		| (2, _)::(2, _)::_ -> TwoPair
+		| (2, _)::(2, _)::_ -> TwoPair						/// TwoPair
 		| (3, _)::(1, _)::_ -> ThreeOfAKind
 		| (3, _)::(2, _)::_ -> FullHouse
 		| (4, _)::_ -> FourOfAKind
