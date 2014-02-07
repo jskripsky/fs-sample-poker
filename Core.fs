@@ -66,6 +66,7 @@ let internal highestRank hand =
 let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)]
 	checkHand hand
 	let suits = hand |> List.map snd		/// suits = [``♠``; ``♠``; ``♠``; ``♠``; ``♣``]
+	// Note: we could also use (suits |> Set.ofList |> Set.count) = 1 instead of (::) and Seq.forall
 	match suits with
 	| s::tail -> tail |> Seq.forall ((=) s)		/// [``♠``; ``♠``; ``♠``; ``♣``] |> Seq.forall ((=) ``♠``) = false
 	| [] -> invalidArg "hand" "No cards."
