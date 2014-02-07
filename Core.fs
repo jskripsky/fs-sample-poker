@@ -44,6 +44,10 @@ let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
 
 /// == Functions ==
 
+/// Input validation
+let inline checkHand hand =
+	if List.length hand <> 5 then invalidArg "hand" "Hand does not conain five cards." else ()
+
 /// Extract card ranks
 let internal extractRanks: (Hand -> Rank list) = List.map fst
 
@@ -60,6 +64,7 @@ let internal highestRank hand =
 
 /// Check for flush (i.e. all cards share the same suit)
 let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)]
+	checkHand hand
 	let suits = hand |> List.map snd		/// suits = [``♠``; ``♠``; ``♠``; ``♠``; ``♣``]
 	match suits with
 	| s::tail -> tail |> Seq.forall ((=) s)		/// [``♠``; ``♠``; ``♠``; ``♣``] |> Seq.forall ((=) ``♠``) = false
@@ -69,6 +74,7 @@ let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); 
 
 /// Check for straight (five consecutively ascending ranks)
 let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``); (v 10, ``♥``); (J, ``♣``)]
+	checkHand hand
 	let ranks = sortRanks hand		/// ranks = [v 8; v 9; v 10; J; Q]
 	let generateStraight start =		/// start = v 8
 		rankOrder				///= [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
