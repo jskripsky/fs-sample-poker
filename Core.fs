@@ -9,14 +9,14 @@ type Suit =
 	| Club		// ♣
 
 type Rank =
-	| Value of v: int  // v ∈ [2..10]
+	| Value of v: int  // assert v ∈ [2..10]
 	| Jack | Queen | King | Ace
 
 let (``♠``, ``♥``, ``♦``, ``♣``) = (Spade, Heart, Diamond, Club)
 let (v, J, Q, K, A) = (Value, Jack, Queen, King, Ace)
 
 type Card = Rank * Suit
-type Hand = Card list
+type Hand = Card list  // assert (h: Hand).Length = 5
 
 /// == Valuation model ==
 type HandCategory =
@@ -78,7 +78,7 @@ let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``
 	checkHand hand
 	let ranks = sortRanks hand		/// ranks = [v 8; v 9; v 10; J; Q]
 	let generateStraight start =		/// start = v 8
-		rankOrder				///= [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
+		rankOrder				///= [v 2; v 3; v 4; v 5; v 6; v 7; v 8; v 9; v 10; J; Q; K; A]
 		|> Seq.skipWhile ((<>) start)	///= seq [v 8; v 9; v 10; J; Q; K; A]
 		|> Seq.take 5				///= seq [v 8; v 9; v 10; J; Q]
 		|> Seq.toList				///= [v 8; v 9; v 10; J; Q]
@@ -90,7 +90,7 @@ let internal groupByRank hand =
 	let swap (x: Rank, y: int) = (y, x)
 	hand			///= [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
 	|> sortRanks		///= [v 9; v 9; J; J; A]
-	|> Seq.countBy id	///= seq [(v 9, 2); (J, 2); (A, 1)]
+	|> Seq.countBy id 	///= seq [(v 9, 2); (J, 2); (A, 1)]
 	|> Seq.map swap	///= seq [(2, v 9); (2, J); (1, A)]
 	|> Seq.sortBy fst	///= seq [(1, A); (2, v 9); (2, J)]
 	|> Seq.toList		///= [(1, A); (2, v 9); (2, J)]
