@@ -101,16 +101,20 @@ let internal groupByRank hand =
 
 /// Calculate the hand's category
 let categorize hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
-	match (isStraight hand, isFlush hand) with				/// (false, false)
-	| (false, false) ->									/// /* this branch taken */
-		let descGroups = hand |> groupByRank |> List.rev	/// [(2, J); (2, v 9); (1, A)]
-		match descGroups with
-		| (1, _)::_ -> HighCard
-		| (2, _)::(1, _)::_ -> OnePair
-		| (2, _)::(2, _)::_ -> TwoPair						/// TwoPair
-		| (3, _)::(1, _)::_ -> ThreeOfAKind
-		| (3, _)::(2, _)::_ -> FullHouse
-		| (4, _)::_ -> FourOfAKind
+	match (isStraight hand, isFlush hand) with		/// (false, false)
+	| (false, false) ->							/// /* this branch taken */
+		let groupLengths =
+			hand							/// [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
+			|> groupByRank					/// [(1, A); (2, v 9); (2, J)]
+			|> List.map fst					/// [1; 2; 2]
+			|> List.rev						/// [2; 2; 1]
+		match groupLengths with
+		| 1::_ -> HighCard
+		| 2::1::_ -> OnePair
+		| 2::2::_ -> TwoPair						/// TwoPair
+		| 3::1::_ -> ThreeOfAKind
+		| 3::2::_ -> FullHouse
+		| 4::_ -> FourOfAKind
 		| _ -> invalidArg "hand" "Hand contains more then five cards."
 	| (true, false) -> Straight
 	| (false, true) -> Flush
