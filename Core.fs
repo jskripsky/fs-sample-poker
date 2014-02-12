@@ -36,8 +36,9 @@ type HandCategory =
 
 /// [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
 let rankOrder = [
-	for v in 2..10 do yield (Value v)
-	yield! [Jack; Queen; King; Ace]]
+	for v in 2..10 do
+		yield (Value v)
+		yield! [Jack; Queen; King; Ace]]
 
 /// Staight starting with Ace as one (but sorted using regular ordering)
 let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
