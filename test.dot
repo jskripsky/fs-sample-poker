@@ -1,0 +1,85 @@
+digraph G {
+	subgraph cluster_0 {
+		label = "Poker";
+
+		subgraph cluster_00 {
+			label = "internal";
+			color=black;
+			rankOrder;
+			straightFromOne;
+			checkHand;
+			extractRanks;
+			sortRanks;
+			highestRank;
+			groupByRank;
+		}
+
+		subgraph cluster_01 {
+			label = "public";
+			color=black;
+			isFlush;
+			isStraight;
+			categorize;
+			compareHands;
+		}
+
+	}
+
+	sortRanks -> extractRanks;
+
+	highestRank -> sortRanks;
+	highestRank -> straightFromOne;
+
+	isFlush -> checkHand;
+	isStraight -> checkHand;
+	isStraight -> sortRanks;
+	isStraight -> rankOrder;
+	isStraight -> straightFromOne;
+
+	groupByRank -> sortRanks;
+
+	categorize -> isStraight;
+	categorize -> isFlush;
+	categorize -> groupByRank;
+	categorize -> highestRank;
+
+	compareHands -> categorize;
+	compareHands -> groupByRank;
+	compareHands -> highestRank;
+
+
+/*
+	subgraph cluster_1 {
+		label = "FSharp.Core";
+
+		subgraph cluster_10 {
+			label = "Operators";
+			color=black;
+			fst; snd;
+			compare; id;
+			invalidArgs;
+			eq [label = "(=)"];
+			neq [label = "(<>)"];
+			pipeRight [label = "(|>)"];
+			compRight [label = "(>>)"];
+
+			invalidArg;
+		}
+
+		subgraph cluster_11 {
+			label = "Collections";
+			subgraph cluster_110 {
+				label = "Seq";
+				forall; skipWhile; take; toList;
+				countBy; map; sortBy;
+			}
+
+			subgraph cluster_111 {
+				label = "List";
+				length; map; sort;
+				rev; cons;
+			}
+		}
+	}
+*/
+}
