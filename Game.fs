@@ -14,11 +14,15 @@ let sortedFullDeck' =
 		for r in rankOrder do
 			yield (r, s)]
 
+/// Generate a random number between 0 (incl.) and Int32.MaxValue (excl).
+let random () =
+	let rand = new System.Random()
+	rand.Next()
+
 /// Shuffle randomly
 let shuffle cards =
-	let rand = new System.Random()
 	cards
-	|> List.map (fun c -> (rand.Next(), c))
+	|> List.map (fun c -> (random (), c))
 	|> List.sortBy fst
 	|> List.map snd
 
