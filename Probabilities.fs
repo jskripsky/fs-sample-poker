@@ -24,7 +24,6 @@ let rec selectMany n values =
 			let! (xs,c2) = selectMany (n-1) c1
 			return x::xs,c2 }
 
-
 // select 2 [1; 2; 3] =
 //	seq [ { Value = [2; 1]; Probability = 1.0 / 6.0 }
 //		{ Value = [3; 1]; Probability = 1.0 / 6.0 }
@@ -46,17 +45,15 @@ let filterInAnyOrder items dist =
 
 /// Tests
 
-sortedFullDeck
-|> select 2
-|> filter ((=) [A,Club; A,Spade])
-|> probability
-// 0.0003770739065
-// 1/2652
+sortedFullDeck		// 52 cards
+|> select 2			// 2652 outcomes
+|> filter ((=) [A,Club; A,Spade]) // 1 outcome
+|> probability			// 1.0 / 2652.0 = 0.0003770739065
 
 // draw Ace of Clubs and Ace of Spaces in any order
-sortedFullDeck
-|> select 2
-|> filterInAnyOrder [A,Club; A,Spade]
-|> probability
-// 0.000754147813
-// 1/1326
+sortedFullDeck		// 52 cards
+|> select 2			// 2652 outcomes
+|> filterInAnyOrder [A,Club; A,Spade] // 2 outcomes
+|> probability			// 2.0 / 2652.0 = 0.000754147813
+
+
