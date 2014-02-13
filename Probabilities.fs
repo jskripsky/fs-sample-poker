@@ -1,7 +1,5 @@
 module Poker.Probabilities
 
-let map f dist = dist |> Seq.map (fun o -> { Value = f o.Value; Probability = o.Probability })
- 
 // selectOne [1; 2; 3] =
 //	seq [ { Value = (1, [2; 3]); Probability = 1.0 / 3.0 }
 //	 	{ Value = (2, [1; 3]); Probability = 1.0 / 3.0 }
@@ -26,12 +24,18 @@ let rec selectMany n values =
 			let! (xs,c2) = selectMany (n-1) c1
 			return x::xs,c2 }
 
-let select n values = selectMany n values |> map (fst >> List.rev)
+
 // select 2 [1; 2; 3] =
 //	seq [ { Value = [2; 1]; Probability = 1.0 / 6.0 }
 //		{ Value = [3; 1]; Probability = 1.0 / 6.0 }
 //		[... 3 ...]
 //		{ Value = [3; 2]; Probability = 1.0 / 6.0 } ]
+let select n values =
+	selectMany n values
+	|> Seq.map (fun o ->
+		{ Value = o.Value |> fst |> List.rev;
+		  Probability = o.Probability })
+
 let remove items = Seq.filter (fun v -> Seq.forall ((<>) v) items)
 
 let filterInAnyOrder items dist =
