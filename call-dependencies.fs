@@ -15,10 +15,10 @@ extractRanks (internal) -> List.map, fst  // 2
 sortRanks (internal) -> extractRanks, (>>), List.sort  // 3 = (1) + 2
 highestRank (internal) -> (|>), sortRanks, (<>), straightFromOne, List.max  // 5 = (2) + 3
 
-isFlush -> checkHand, (|>),  List.map, snd, List<'T>.(::), Seq.forall, (=), invalidArg  // 7 = (1) + 6
+isFlush -> checkHand, (|>),  List.map, snd, List<'T>.(::), List.forall, (=), invalidArg  // 7 = (1) + 6
 isStraight -> checkHand, sortRanks, rankOrder, (|>), Seq.skipWhile, (<>), Seq.take, Seq.toList, straightFromOne  // 9 = (4) + 5
 
-groupByRank (internal) -> sortRanks, (|>), Seq.countBy, id, Seq.map, Seq.sortBy, fst, Seq.toList  // 8 = (1) + 7
+groupByRank (internal) -> sortRanks, (|>), Seq.countBy, id, Seq.toList, List.map, fst, List.sortBy   // 8 = (1) + 7
 categorizeHand -> isStraight, isFlush, (|>), groupByRank, List.rev, List<'T>.(::), invalidArg, highestRank  // 8 = (4) + 4
 compareHands -> categorizeHand, compare, groupByRank, highestRank  // 4 = (3) + 1
 
@@ -38,5 +38,5 @@ Core.Operators = /// 9
 	(|>), (>>),
 	invalidArg
 
-List = length, map, sort, rev /// 4
-Seq = forall, skipWhile, take, toList, countBy, map, sortBy /// 7
+List = length, map, forAll, sort, sortBy, rev /// 6
+Seq = skipWhile, take, toList, countBy /// 4
