@@ -1,9 +1,5 @@
 module Poker.Probabilities
 
-let filterInAnyOrder items dist =
-	items
-	|> Seq.fold (fun d item -> filter (Seq.exists ((=) (item))) d) dist
- 
 let map f dist = dist |> Seq.map (fun o -> { Value = f o.Value; Probability = o.Probability })
  
 let selectOne values =
@@ -20,9 +16,11 @@ let rec selectMany n values =
 			return x::xs,c2 }
 
 let select n values = selectMany n values |> map (fst >> List.rev)
-
 let remove items = Seq.filter (fun v -> Seq.forall ((<>) v) items)
 
+let filterInAnyOrder items dist =
+	items
+	|> Seq.fold (fun d item -> filter (Seq.exists ((=) (item))) d) dist
 
 /// Tests
 sortedFullDeck
