@@ -9,7 +9,7 @@ type ShuffleDeck = Deck -> Deck
 type Deal = Deck -> (Deck * Card)
 type Pickup = (Hand * Card) -> Hand
 
-let sortedFullDeck' =
+let sortedFullDeck =
 	[for s in [Spade; Heart; Diamond; Club] do 
 		for r in rankOrder do
 			yield (r, s)]
