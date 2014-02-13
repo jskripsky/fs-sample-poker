@@ -29,8 +29,6 @@ Microsoft.FSharp =
 	Core.Operators,
 	Collections
 
-Collections = List, Seq, List<'T>.(::)
-
 Core.Operators = /// 9
 	fst, snd,
 	compare, id,
@@ -38,5 +36,8 @@ Core.Operators = /// 9
 	(|>), (>>),
 	invalidArg
 
-List = length, map, forAll, sort, sortBy, rev /// 6
+Collections = List, Seq  (* List<'T>.(::) merged into List *)
+
+List = length, map, forAll, sort, sortBy, rev, (::) /// 7
 Seq = skipWhile, take, toList, countBy /// 4
+
