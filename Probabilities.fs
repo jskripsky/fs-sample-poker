@@ -7,7 +7,7 @@ let map f dist = dist |> Seq.map (fun o -> { Value = f o.Value; Probability = o.
 //	 	{ Value = (2, [1; 3]); Probability = 1.0 / 3.0 }
 //	 	{ Value = (3, [1; 2]); Probability = 1.0 / 3.0 } ]
 let selectOne values =
-	[for e in values -> e, values |> Seq.filter ((<>) e)]
+	[for e in values -> (e, values |> Seq.filter ((<>) e))]
 	|> toUniformDistribution
  
 // selectMany 0 [1; 2; 3] = seq [{Value = ([], [1; 2; 3]); Probability = 1.0;}]
@@ -36,7 +36,9 @@ let remove items = Seq.filter (fun v -> Seq.forall ((<>) v) items)
 
 let filterInAnyOrder items dist =
 	items
-	|> Seq.fold (fun d item -> filter (Seq.exists ((=) (item))) d) dist
+	|> Seq.fold (fun d item -> filter (Seq.exists ((=) item)) d) dist
+
+
 
 /// Tests
 sortedFullDeck
