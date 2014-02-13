@@ -46,8 +46,14 @@ let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
 /// == Functions ==
 
 /// Input validation
+let inline checkCard card =
+	match card with
+	| (Value x, _) -> if x <= 2 && 10 <= x then () else invalidArg "hand" "Hand does not conain five cards."
+	| _ -> ()
+
 let inline checkHand hand =
-	if List.length hand <> 5 then invalidArg "hand" "Hand does not conain five cards." else ()
+	hand |> List.iter checkCard
+	if List.length hand = 5 then () else invalidArg "hand" "Hand does not conain five cards."
 
 /// Extract card ranks
 let internal getRanks (cards: Card list) = cards |> List.map fst
