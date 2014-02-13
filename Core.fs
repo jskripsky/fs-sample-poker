@@ -106,7 +106,7 @@ let internal groupByRank hand =
 /// [(v 4, ``♦``); (v 10, ``♥``); (v 4, ``♥``); (Q, ``♥``); (v 4, ``♠``)] => [(1, v 10); (1, Q); (3, v 4)]
 
 /// Calculate the hand's category
-let categorize hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
+let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
 	match (isStraight hand, isFlush hand) with		/// (false, false)
 	| (false, false) ->							/// /* this branch taken */
 		let groupLengths =
@@ -127,7 +127,7 @@ let categorize hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (
 	| (true, true) -> if highestRank hand <> Ace then StraightFlush else RoyalFlush
 
 let compareHands h1 h2 =
-	let (c1, c2) = (categorize h1, categorize h2)
+	let (c1, c2) = (categorizeHand h1, categorizeHand h2)
 	match compare c1 c2 with
 	| 0 ->  // equal categories
 		match c1 with

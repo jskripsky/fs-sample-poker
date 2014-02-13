@@ -19,8 +19,8 @@ isFlush -> checkHand, (|>),  List.map, snd, List<'T>.(::), Seq.forall, (=), inva
 isStraight -> checkHand, sortRanks, rankOrder, (|>), Seq.skipWhile, (<>), Seq.take, Seq.toList, straightFromOne  // 9 = (4) + 5
 
 groupByRank (internal) -> sortRanks, (|>), Seq.countBy, id, Seq.map, Seq.sortBy, fst, Seq.toList  // 8 = (1) + 7
-categorize -> isStraight, isFlush, (|>), groupByRank, List.rev, List<'T>.(::), invalidArg, highestRank  // 8 = (4) + 4
-compareHands -> categorize, compare, groupByRank, highestRank  // 4 = (3) + 1
+categorizeHand -> isStraight, isFlush, (|>), groupByRank, List.rev, List<'T>.(::), invalidArg, highestRank  // 8 = (4) + 4
+compareHands -> categorizeHand, compare, groupByRank, highestRank  // 4 = (3) + 1
 
 internal = straightFromOne, checkHand, extractRank, sortRanks, highestRank, groupdByRank
 public = rankOrder, isFlush, isStraight, categorize, compareHands
