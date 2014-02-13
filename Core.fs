@@ -50,10 +50,10 @@ let inline checkHand hand =
 	if List.length hand <> 5 then invalidArg "hand" "Hand does not conain five cards." else ()
 
 /// Extract card ranks
-let internal extractRanks: (Hand -> Rank list) = List.map fst
+let internal getRanks (cards: Card list) = cards |> List.map fst
 
 /// Sort ranks
-let internal sortRanks = extractRanks >> List.sort
+let internal sortRanks = getRanks >> List.sort
 
 /// Find highest ranking card in hand
 let internal highestRank hand =
@@ -69,7 +69,7 @@ let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); 
 	let suits = hand |> List.map snd		/// suits = [``♠``; ``♠``; ``♠``; ``♠``; ``♣``]
 	// Note: we could also use (suits |> Set.ofList |> Set.count) = 1 instead of (::) and Seq.forall
 	match suits with
-	| s::tail -> tail |> Seq.forall ((=) s)		/// [``♠``; ``♠``; ``♠``; ``♣``] |> Seq.forall ((=) ``♠``) = false
+	| s::tail -> tail |> List.forall ((=) s)		/// [``♠``; ``♠``; ``♠``; ``♣``] |> Seq.forall ((=) ``♠``) = false
 	| [] -> invalidArg "hand" "No cards."
 
 /// [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] => false
