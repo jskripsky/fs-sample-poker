@@ -116,7 +116,7 @@ let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``
 		match groupLengths with
 		| 1::_ -> HighCard
 		| 2::1::_ -> OnePair
-		| 2::2::_ -> TwoPair						/// TwoPair
+		| 2::2::_ -> TwoPair					/// TwoPair
 		| 3::1::_ -> ThreeOfAKind
 		| 3::2::_ -> FullHouse
 		| 4::_ -> FourOfAKind
