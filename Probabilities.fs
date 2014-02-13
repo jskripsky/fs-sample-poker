@@ -45,15 +45,18 @@ let filterInAnyOrder items dist =
 
 
 /// Tests
+
 sortedFullDeck
 |> select 2
 |> filter ((=) [A,Club; A,Spade])
 |> probability
-|> printfn "%A" // prints "1/2652"
- 
+// 0.0003770739065
+// 1/2652
+
 // draw Ace of Clubs and Ace of Spaces in any order
 sortedFullDeck
 |> select 2
 |> filterInAnyOrder [A,Club; A,Spade]
 |> probability
-|> printfn "A" // prints "1/1326"
+// 0.000754147813
+// 1/1326
