@@ -1,15 +1,15 @@
 /// Sample data
-let someHand = [(v 9, ``♦``); (v 5, ``♦``); (A, ``♠``); (v 2, ``♦``); (J, ``♣``)]
-let twoPairsHand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
-let threeOfAKindHand = [(v 4, ``♦``); (v 10, ``♥``); (v 4, ``♥``); (Q, ``♥``); (v 4, ``♠``)]
-let straightHand = [(v 9, ``♦``) ; (v 10, ``♥``); (J, ``♥``); (Q, ``♥``); (K, ``♠``)]
-let fullHouseHand = [(J, ``♦``); (v 9, ``♠``); (v 9, ``♥``); (J, ``♣``); (v 9, ``♦``)]
+let someHand = [(n 9, ``♦``); (n 5, ``♦``); (A, ``♠``); (n 2, ``♦``); (J, ``♣``)]
+let twoPairsHand = [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
+let threeOfAKindHand = [(n 4, ``♦``); (n 10, ``♥``); (n 4, ``♥``); (Q, ``♥``); (n 4, ``♠``)]
+let straightHand = [(n 9, ``♦``) ; (n 10, ``♥``); (J, ``♥``); (Q, ``♥``); (K, ``♠``)]
+let fullHouseHand = [(J, ``♦``); (n 9, ``♠``); (n 9, ``♥``); (J, ``♣``); (n 9, ``♦``)]
 
-let flushHand = [v 10; J; v 4; Q; v 8]; |> List.map (fun r -> (r, ``♦``))
+let flushHand = [n 10; J; n 4; Q; n 8]; |> List.map (fun r -> (r, ``♦``))
 
-let fourOfAKindHand = [(J, ``♦``); (v 6, ``♠``); (v 6, ``♥``); (v 6, ``♣``); (v 6, ``♦``)]
-let straightFlushHand = [v 7; v 8; v 9; v 10; J] |> List.map (fun r -> (r, ``♥``))
-let royalFlushHand = [v 10; J; Q; K; A] |> List.map (fun r -> (r, ``♠``))
+let fourOfAKindHand = [(J, ``♦``); (n 6, ``♠``); (n 6, ``♥``); (n 6, ``♣``); (n 6, ``♦``)]
+let straightFlushHand = [n 7; n 8; n 9; n 10; J] |> List.map (fun r -> (r, ``♥``))
+let royalFlushHand = [n 10; J; Q; K; A] |> List.map (fun r -> (r, ``♠``))
 
 let ioPairs = [
 	royalFlushHand, RoyalFlush

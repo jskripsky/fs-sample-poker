@@ -9,11 +9,11 @@ type Suit =
 	| Club		// ♣
 
 type Rank =
-	| Value of v: int  // assert v ∈ [2..10]
+	| Num of v: int  // assert v ∈ [2..10]
 	| Jack | Queen | King | Ace
 
 let (``♠``, ``♥``, ``♦``, ``♣``) = (Spade, Heart, Diamond, Club)
-let (v, J, Q, K, A) = (Value, Jack, Queen, King, Ace)
+let (n, J, Q, K, A) = (Num, Jack, Queen, King, Ace)
 
 type Card = Rank * Suit
 type Hand = Card list  // assert (h: Hand).Length = 5
@@ -32,47 +32,52 @@ type HandCategory =
 	| RoyalFlush		// straight flush down from Ace
 
 
-/// == Values ==
+/// == Nums ==
 
-/// [v 2; v 3; v 4; v 5; v 6; v7; v 8; v 9; v 10; J; Q; K; A]
+/// [n 2; n 3; n 4; n 5; n 6; v7; n 8; n 9; n 10; J; Q; K; A]
 let rankOrder = [
-	for v in 2..10 do yield (Value v)
+	for n in 2..10 do yield (Num n)
 	yield! [Jack; Queen; King; Ace]]
 
 /// Staight starting with Ace as one (but sorted using regular ordering)
-let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
+let internal straightFromOne = [n 2; n 3; n 4; n 5; Ace]
 
 /// == Functions ==
 
 /// Input validation
+
 /// checkCard (v 13; Spade) => Exception
 let inline checkCard card =
 	match card with
-	| (Value x, _) -> if x <= 2 && 10 <= x then () else invalidArg "card" (sprintf "Invalid number card: %A" card)
+	| (Num x, _) when (x < 2 || 10 < x) -> invalidArg "card" (sprintf "Invalid number card: %A" card)
 	| _ -> ()
 
+/// checkHand [(Ace, Spade)] => Exception
 let inline checkHand hand =
 	hand |> List.iter checkCard
 	if List.length hand = 5 then () else invalidArg "hand" "Hand does not conain five cards."
 
 /// Get card ranks
-/// getRanks [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] = [A; J; v 2; v 5; A]
+/// getRanks [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = [A; J; n 2; n 5; A]
 let internal getRanks (cards: Card list) = cards |> List.map fst
 
 /// Sort ranks
-/// sortRanks [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] = [v 2; v 5; J; A; A]
+/// sortRanks [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = [n 2; n 5; J; A; A]
 let internal sortRanks = getRanks >> List.sort
 
 /// Find highest ranking card in hand
+/// highestRank [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = A
 let internal highestRank hand =
 	let ranks = hand |> sortRanks
 	if ranks <> straightFromOne then
 		ranks |> List.max
 	else
-		(v 5)  // straight with Ace = 1
+		(n 5)  // straight with Ace = 1
 
 /// Check for flush (i.e. all cards share the same suit)
-let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)]
+/// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = false
+/// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (n 4, ``♠``)] = true
+let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)]
 	checkHand hand
 	let suits = hand |> List.map snd		/// suits = [``♠``; ``♠``; ``♠``; ``♠``; ``♣``]
 	// Note: we could also use (suits |> Set.ofList |> Set.count) = 1 instead of (::) and Seq.forall
@@ -80,40 +85,42 @@ let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); 
 	| s::tail -> tail |> List.forall ((=) s)		/// [``♠``; ``♠``; ``♠``; ``♣``] |> Seq.forall ((=) ``♠``) = false
 	| [] -> invalidArg "hand" "No cards."
 
-/// [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] => false
 
 /// Check for straight (five consecutively ascending ranks)
-let isStraight hand =				/// hand = [(v 8, ``♠``); (Q, ``♦``); (v 9, ``♦``); (v 10, ``♥``); (J, ``♣``)]
+/// isStraight [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = false
+/// isStraight [(n 8, ``♠``); (Q, ``♦``); (n 9, ``♦``); (n 10, ``♥``); (J, ``♣``)] = true
+
+let isStraight hand =				/// hand = [(n 8, ``♠``); (Q, ``♦``); (n 9, ``♦``); (n 10, ``♥``); (J, ``♣``)]
 	checkHand hand
-	let ranks = sortRanks hand		/// ranks = [v 8; v 9; v 10; J; Q]
-	let generateStraight start =		/// start = v 8
-		rankOrder				///= [v 2; v 3; v 4; v 5; v 6; v 7; v 8; v 9; v 10; J; Q; K; A]
-		|> Seq.skipWhile ((<>) start)	///= seq [v 8; v 9; v 10; J; Q; K; A]
-		|> Seq.take 5				///= seq [v 8; v 9; v 10; J; Q]
-		|> Seq.toList				///= [v 8; v 9; v 10; J; Q]
+	let ranks = sortRanks hand		/// ranks = [n 8; n 9; n 10; J; Q]
+	let generateStraight start =		/// start = n 8
+		rankOrder				///= [n 2; n 3; n 4; n 5; n 6; n 7; n 8; n 9; n 10; J; Q; K; A]
+		|> Seq.skipWhile ((<>) start)	///= seq [n 8; n 9; n 10; J; Q; K; A]
+		|> Seq.take 5				///= seq [n 8; n 9; n 10; J; Q]
+		|> Seq.toList				///= [n 8; n 9; n 10; J; Q]
 	ranks = generateStraight (ranks.[0])		///= true
 	|| ranks = straightFromOne  // special case Ace = v 1
 
 /// Group cards by rank, sort first by count, then rank
 let internal groupByRank hand =
 	let swap (x: Rank, y: int) = (y, x)
-	hand			///= [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
-	|> sortRanks		///= [v 9; v 9; J; J; A]
-	|> Seq.countBy id 	///= seq [(v 9, 2); (J, 2); (A, 1)]
-	|> Seq.toList		///= [(v 9, 2); (J, 2); (A, 1)]
-	|> List.map swap	///= [(2, v 9); (2, J); (1, A)]
-	|> List.sortBy fst	///= [(1, A); (2, v 9); (2, J)]
+	hand			///= [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
+	|> sortRanks		///= [n 9; n 9; J; J; A]
+	|> Seq.countBy id 	///= seq [(n 9, 2); (J, 2); (A, 1)]
+	|> Seq.toList		///= [(n 9, 2); (J, 2); (A, 1)]
+	|> List.map swap	///= [(2, n 9); (2, J); (1, A)]
+	|> List.sortBy fst	///= [(1, A); (2, n 9); (2, J)]
 
-/// [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)] => [(1, A); (2, v 9); (2, J)]
-/// [(v 4, ``♦``); (v 10, ``♥``); (v 4, ``♥``); (Q, ``♥``); (v 4, ``♠``)] => [(1, v 10); (1, Q); (3, v 4)]
+/// [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)] => [(1, A); (2, n 9); (2, J)]
+/// [(n 4, ``♦``); (n 10, ``♥``); (n 4, ``♥``); (Q, ``♥``); (n 4, ``♠``)] => [(1, n 10); (1, Q); (3, n 4)]
 
 /// Calculate the hand's category
-let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
+let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
 	match (isStraight hand, isFlush hand) with		/// (false, false)
 	| (false, false) ->							/// /* this branch taken */
 		let groupLengths =
-			hand							/// [(A, ``♠``); (J, ``♦``); (v 9, ``♦``); (v 9, ``♥``); (J, ``♣``)]
-			|> groupByRank					/// [(1, A); (2, v 9); (2, J)]
+			hand							/// [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
+			|> groupByRank					/// [(1, A); (2, n 9); (2, J)]
 			|> List.map fst					/// [1; 2; 2]
 			|> List.rev						/// [2; 2; 1]
 		match groupLengths with
@@ -135,5 +142,5 @@ let compareHands h1 h2 =
 		match c1 with
 		| HighCard | OnePair | TwoPair | ThreeOfAKind
 		| FullHouse | FourOfAKind -> compare (groupByRank h1) (groupByRank h2)
-		| _ -> compare (highestRank h1) (highestRank h2)  // Note: this handles staights with Ace = (Value 1) as well.
+		| _ -> compare (highestRank h1) (highestRank h2)  // Note: this handles staights with Ace = (Num 1) as well.
 	| c -> c  // different categories
