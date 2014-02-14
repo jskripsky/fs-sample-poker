@@ -1,3 +1,10 @@
 div {
 	border: 1px solid gray;
 }
+
+span {
+	background-color: lightgray;
+	padding: 1px 3px;
+	border: 1px solid darkgray;
+	margin: 0px 1px;
+}
