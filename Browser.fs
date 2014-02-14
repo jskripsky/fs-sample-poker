@@ -8,13 +8,29 @@ open System.Web
 let htmlEncode (txt: string) = HttpUtility.HtmlEncode txt
 let urlEncode (txt: string) = HttpUtility.UrlEncode txt
 
-let internal element tag (cls: string seq) txt = sprintf "<%s class='%s'>%s</%s>" tag (cls |> String.concat " ") txt tag
-
 type ElementWrapper = seq<string> -> string -> string
+
+// string -> ElementWrapper
+let internal plainElement tag txt = sprintf "<%s>%s<%s>" tag txt tag
+let internal element tag (cls: string seq) txt =
+	let clsAttr =
+		if Seq.length cls > 0 then
+			sprintf " class='%s'" (cls |> String.concat " ")
+		else ""
+	sprintf "<%s%s>%s</%s>" tag clsAttr txt tag
+
+let Html = plainElement "html"
+let Head = plainElement "head"
+let Body = plainElement "body"
+
 let Div  = element "div": ElementWrapper
 let Span = element "span": ElementWrapper
 
-let internal Wrap (bodyHtml: string) = String.Format ("<html><head><link href='/home/js/poker/style.css' rel='stylesheet' type='text/css' /><body>\n{0}\n</body></html>", bodyHtml)
+let internal Wrap (bodyHtml: string) =
+	String.Format (
+		Html (
+			Head "<link href='/home/js/poker/style.css' rel='stylesheet' type='text/css' />" +
+			Body bodyHtml))
 
 let LoadInBrowser html =
 	let pageFilename = Path.ChangeExtension (Path.GetTempFileName (), ".html")
@@ -24,4 +40,6 @@ let LoadInBrowser html =
 	p |> ignore
 
 
-/// [1..10] |> List.map (fun x -> sprintf "<div>%s</div>" (string x)) |> String.concat "\n" |> LoadInBrowser
+
+let list = [1..10] |> List.map (fun x -> Span [] ("Span " + (string x))) |> String.concat "; "
+"[" + list + "]" |> LoadInBrowser
