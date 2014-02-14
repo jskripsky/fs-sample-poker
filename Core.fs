@@ -45,6 +45,7 @@ let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
 /// == Functions ==
 
 /// Input validation
+/// checkCard (v 13; Spade) => Exception
 let inline checkCard card =
 	match card with
 	| (Value x, _) -> if x <= 2 && 10 <= x then () else invalidArg "card" (sprintf "Invalid number card: %A" card)
@@ -54,10 +55,12 @@ let inline checkHand hand =
 	hand |> List.iter checkCard
 	if List.length hand = 5 then () else invalidArg "hand" "Hand does not conain five cards."
 
-/// Extract card ranks
+/// Get card ranks
+/// getRanks [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] = [A; J; v 2; v 5; A]
 let internal getRanks (cards: Card list) = cards |> List.map fst
 
 /// Sort ranks
+/// sortRanks [(A, ``♠``); (J, ``♠``); (v 2, ``♠``); (v 5, ``♠``); (A, ``♣``)] = [v 2; v 5; J; A; A]
 let internal sortRanks = getRanks >> List.sort
 
 /// Find highest ranking card in hand
