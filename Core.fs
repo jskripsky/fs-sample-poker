@@ -47,7 +47,7 @@ let internal straightFromOne = [v 2; v 3; v 4; v 5; Ace]
 /// Input validation
 let inline checkCard card =
 	match card with
-	| (Value x, _) -> if x <= 2 && 10 <= x then () else invalidArg "hand" "Hand does not conain five cards."
+	| (Value x, _) -> if x <= 2 && 10 <= x then () else invalidArg "card" (sprintf "Invalid number card: %A" card)
 	| _ -> ()
 
 let inline checkHand hand =
