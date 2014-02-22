@@ -3,15 +3,17 @@ module Poker.Core
 /// == Card model ==
 [<NoComparison>]
 type Suit =
-	| Spade		// ♠
-	| Heart		// ♥
-	| Diamond	// ♦
-	| Club		// ♣
+	| Spade		/// ♠
+	| Heart		/// ♥
+	| Diamond	/// ♦
+	| Club		/// ♣
 
 type Rank =
-	| Num of v: int  // assert v ∈ [2..10]
+	| Num of v: int  // v ∈ [2..10]
 	| Jack | Queen | King | Ace
 
+
+/// Convenience aliases
 let (``♠``, ``♥``, ``♦``, ``♣``) = (Spade, Heart, Diamond, Club)
 let (n, J, Q, K, A) = (Num, Jack, Queen, King, Ace)
 
@@ -20,11 +22,11 @@ type Hand = Card list  // assert (h: Hand).Length = 5
 
 /// == Valuation model ==
 type HandCategory =
-	| HighCard		// no matching ranks, no straight or flush
+	| HighCard		// no matching ranks, no straight, no flush
 	| OnePair		// 2 + 1 + 1+ 1
 	| TwoPair		// 2 + 2 + 1
 	| ThreeOfAKind	// 3 + 1 + 1
-	| Straight		// r..(r + 4)
+	| Straight		// [r; r + 1; ... r + 4]
 	| Flush			// matching suits
 	| FullHouse		// 3 + 2
 	| FourOfAKind	// 4 + 1
@@ -34,10 +36,11 @@ type HandCategory =
 
 /// == Nums ==
 
-/// [n 2; n 3; n 4; n 5; n 6; v7; n 8; n 9; n 10; J; Q; K; A]
 let rankOrder = [
 	for n in 2..10 do yield (Num n)
 	yield! [Jack; Queen; King; Ace]]
+/// rankOrder = [n 2; n 3; n 4; n 5; n 6; v7; n 8; n 9; n 10; J; Q; K; A]
+/// rankOrder.Length = 13
 
 /// Staight starting with Ace as one (but sorted using regular ordering)
 let internal straightFromOne = [n 2; n 3; n 4; n 5; Ace]
@@ -75,9 +78,9 @@ let internal highestRank hand =
 		(n 5)  // straight with Ace = 1
 
 /// Check for flush (i.e. all cards share the same suit)
-/// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = false
+/// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (n 4, ``♣``)] = false
 /// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (n 4, ``♠``)] = true
-let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)]
+let isFlush hand =						/// hand = [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (n 4, ``♣``)]
 	checkHand hand
 	let suits = hand |> List.map snd		/// suits = [``♠``; ``♠``; ``♠``; ``♠``; ``♣``]
 	// Note: we could also use (suits |> Set.ofList |> Set.count) = 1 instead of (::) and Seq.forall
@@ -117,13 +120,13 @@ let internal groupByRank hand =
 /// Calculate the hand's category
 let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
 	match (isStraight hand, isFlush hand) with		/// (false, false)
-	| (false, false) ->							/// /* this branch taken */
+	| (false, false) ->							///  /* this branch taken */
 		let groupLengths =
 			hand							/// [(A, ``♠``); (J, ``♦``); (n 9, ``♦``); (n 9, ``♥``); (J, ``♣``)]
 			|> groupByRank					/// [(1, A); (2, n 9); (2, J)]
 			|> List.map fst					/// [1; 2; 2]
-			|> List.rev						/// [2; 2; 1]
-		match groupLengths with
+			|> List.rev						/// [2; 2; 1]  // (inverted ordering)
+		match groupLengths with				/// note: 'groupLengths' are sorted in _descending_ order
 		| 1::_ -> HighCard
 		| 2::1::_ -> OnePair
 		| 2::2::_ -> TwoPair					/// TwoPair
