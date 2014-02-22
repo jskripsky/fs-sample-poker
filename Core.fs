@@ -64,14 +64,6 @@ let internal getRanks (cards: Card list) = cards |> List.map fst
 /// sortRanks [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = [n 2; n 5; J; A; A]
 let internal sortRanks = getRanks >> List.sort
 
-/// Find highest ranking card in hand
-/// highestRank [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (A, ``♣``)] = A
-let internal highestRank hand =
-	let ranks = hand |> sortRanks
-	if ranks <> straightFromOne then
-		ranks |> List.max
-	else
-		(n 5)  // straight with Ace = 1
 
 /// Check for flush (i.e. all cards share the same suit)
 /// isFlush [(A, ``♠``); (J, ``♠``); (n 2, ``♠``); (n 5, ``♠``); (n 4, ``♣``)] = false
@@ -132,7 +124,10 @@ let categorizeHand hand =	 /// hand = [(A, ``♠``); (J, ``♦``); (n 9, ``♦``
 		| _ -> invalidArg "hand" "Hand contains more then five cards."
 	| (true, false) -> Straight
 	| (false, true) -> Flush
-	| (true, true) -> if highestRank hand <> Ace then StraightFlush else RoyalFlush
+	| (true, true) ->
+		match (sortRanks hand) with
+		| [Num 10, J, Q, K, A] -> RoyalFlush
+		| _ -> StraightFlush
 
 let compareHands h1 h2 =
 	let (c1, c2) = (categorizeHand h1, categorizeHand h2)
@@ -141,5 +136,5 @@ let compareHands h1 h2 =
 		match c1 with
 		| HighCard | OnePair | TwoPair | ThreeOfAKind
 		| FullHouse | FourOfAKind -> compare (groupByRank h1) (groupByRank h2)
-		| _ -> compare (highestRank h1) (highestRank h2)  // Note: this handles staights with Ace = (Num 1) as well.
+		| _ -> compare (sortRanks h1) (sortRanks h2)  // TODO: check if this handles staights with Ace = (Num 1) as well.
 	| c -> c  // different categories
