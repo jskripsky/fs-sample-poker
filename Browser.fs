@@ -43,3 +43,25 @@ let LoadInBrowser html =
 
 let list = [1..10] |> List.map (fun x -> Span [] ("Span " + (string x))) |> String.concat "; "
 "[" + list + "]" |> LoadInBrowser
+
+let rec htmlize obj =
+	if obj = null then ""
+	else
+		let t = obj.GetType ()
+		type FST = FSharpType
+		match obj with
+		| _ -> when FSharpType.IsTuple t -> 
+			FSharpValue.GetTupleFields obj
+			|> Seq.map htmlize
+			|> Seq.concat " "
+		| _ -> when FST.IsUnion t ->
+			let (unionCaseInfo, objs) = FSharpValue.GetUnionFields (obj, t)
+			objs
+			|> Seq.map htmlize
+			|> Seq.concat " "
+			Div [] unionCaseInfo.Name
+		| _ -> when FST.IsRecord t ->
+			FSharpValue.GetRecordFields obj
+			|> Seq.map htmlize >> Div []
+			|> Seq.concat " "
+		| _ -> sprintf "%A" obj
