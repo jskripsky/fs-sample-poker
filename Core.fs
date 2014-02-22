@@ -35,11 +35,11 @@ type HandCategory =
 
 /// == Nums ==
 
-let rankOrder = [
-	for n in 2..10 do yield (Num n)
-	yield! [Jack; Queen; King; Ace]]
 /// rankOrder = [n 2; n 3; n 4; n 5; n 6; v7; n 8; n 9; n 10; J; Q; K; A]
 /// rankOrder.Length = 13
+let rankOrder =
+	[for n in 2..10 do yield (Num n)
+	 yield! [Jack; Queen; King; Ace]]
 
 /// Staight starting with Ace as one (but sorted using regular ordering)
 let internal straightFromOne = [n 2; n 3; n 4; n 5; Ace]
