@@ -12,13 +12,12 @@ type Rank =
 	| Num of v: int  // v ∈ [2..10]
 	| Jack | Queen | King | Ace
 
+type Card = Rank * Suit
+type Hand = Card list  // (h: Hand).Length = 5
 
 /// Convenience aliases
 let (``♠``, ``♥``, ``♦``, ``♣``) = (Spade, Heart, Diamond, Club)
 let (n, J, Q, K, A) = (Num, Jack, Queen, King, Ace)
-
-type Card = Rank * Suit
-type Hand = Card list  // assert (h: Hand).Length = 5
 
 /// == Valuation model ==
 type HandCategory =
