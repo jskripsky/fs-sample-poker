@@ -41,9 +41,6 @@ let rankOrder =
 	[for n in 2..10 do yield (Num n)
 	 yield! [Jack; Queen; King; Ace]]
 
-/// Staight starting with Ace as one (but sorted using regular ordering)
-let internal straightFromOne = [n 2; n 3; n 4; n 5; Ace]
-
 /// == Functions ==
 
 /// Input validation
@@ -101,7 +98,7 @@ let isStraight hand =				/// hand = [(n 8, ``♠``); (Q, ``♦``); (n 9, ``♦``
 		|> Seq.take 5				///= seq [n 8; n 9; n 10; J; Q]
 		|> Seq.toList				///= [n 8; n 9; n 10; J; Q]
 	ranks = generateStraight (ranks.[0])		///= true
-	|| ranks = straightFromOne  // special case Ace = v 1
+	|| ranks = [n 2; n 3; n 4; n 5; Ace]  // special case Ace = v 1
 
 /// Group cards by rank, sort first by count, then rank
 let internal groupByRank hand =
