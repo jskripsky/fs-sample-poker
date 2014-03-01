@@ -35,7 +35,7 @@ type HandCategory =
 
 /// == Nums ==
 
-/// rankOrder = [n 2; n 3; n 4; n 5; n 6; v7; n 8; n 9; n 10; J; Q; K; A]
+/// rankOrder = [n 2; n 3; n 4; n 5; n 6; n 7; n 8; n 9; n 10; J; Q; K; A]
 /// rankOrder.Length = 13
 let rankOrder =
 	[for n in 2..10 do yield (Num n)
